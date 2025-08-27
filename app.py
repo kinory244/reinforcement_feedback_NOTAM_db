@@ -288,10 +288,26 @@ with col2:
         st.session_state.index += 1
         st.rerun()
 
+    import io
+
     if colb4.button("🚪 Exit for today"):
+        # aggiorna indice e salva lato server
         df_user["last_index"] = st.session_state.index
         df_user.to_csv(USER_CSV, index=False)
-        st.info("👋 Session saved locally. You can continue tomorrow.")
+
+        # prepara CSV per download locale dell’utente
+        csv_buffer = io.StringIO()
+        df_user.to_csv(csv_buffer, index=False)
+
+        st.success("✅ Feedback saved. Download the file to keep it with you 👇")
+
+        st.download_button(
+            label="⬇️ Download your feedback",
+            data=csv_buffer.getvalue(),
+            file_name=USER_CSV,
+            mime="text/csv"
+        )
+
         st.stop()
 
     # ensure only relevant cols are kept
