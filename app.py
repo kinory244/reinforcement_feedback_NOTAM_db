@@ -75,12 +75,14 @@ def upload_to_drive(local_file, remote_name, folder_id=None):
     else:
         meta = {'title': remote_name}
         if folder_id:
+            # 👇 forziamo che il file nasca dentro la cartella condivisa con te
             meta['parents'] = [{'id': folder_id}]
         file_drive = drive.CreateFile(meta)
 
     file_drive.SetContentFile(local_file)
     file_drive.Upload()
     return file_drive['id']
+
 
 # password check
 password = st.text_input("🔑 Enter access password:", type="password")
@@ -366,7 +368,7 @@ with col2:
         height=120,
         key=f"notes_{current_idx}"  # chiave dinamica per ogni NOTAM
     )
-    
+
     st.markdown("---")
 
     # save buttons
