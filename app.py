@@ -216,7 +216,7 @@ with col1:
             badge("LAND ASAP", row['class_impact_land'], "🛬")
         )
 
-        st.markdown(f"""
+        st.code(f"""
         <div style="margin-top:12px; margin-bottom:12px;
                     padding:12px 8px 20px 8px;  /* top, right, bottom, left */
                     border:1px solid #ddd; border-radius:8px; 
