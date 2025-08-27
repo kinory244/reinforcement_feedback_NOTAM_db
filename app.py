@@ -199,30 +199,31 @@ with col1:
             "Critical": "#e74c3c"   # red
         }
 
-        def badge(label, value, icon):
+        def badge(label, value, icon=""):
+            if not value:
+                value = "N/A"
             return f"""
-            <div style='margin:2px 0; font-size:16px;'>
-            <span style='font-weight:bold; color:#000;'>{label}:</span>
-            <span style="background-color:{impact_map.get(value,'#95a5a6')}; color:#fff;
-                        padding:4px 12px; border-radius:12px; font-weight:bold; margin-left:8px;">
-                {value}
-            </span>
+            <div style='margin:2px 0; font-size:16px; display:flex; align-items:center;'>
+                <span style='font-weight:bold; color:#000; margin-right:6px;'>{icon} {label}:</span>
+                <span style="background-color:{impact_map.get(value,'#95a5a6')}; color:#fff;
+                            padding:4px 12px; border-radius:12px; font-weight:bold;">
+                    {value}
+                </span>
             </div>
             """
 
-        impact_html = (
-            badge("MEDICAL EMERGENCY", row['class_impact_med'], "💊") +
-            badge("TECHNICAL ISSUE", row['class_impact_tech'], "⚙️") +
-            badge("LAND ASAP", row['class_impact_land'], "🛬")
-        )
+        impact_html = "".join([
+            badge("MEDICAL EMERGENCY", row['class_impact_med'], "💊"),
+            badge("TECHNICAL ISSUE", row['class_impact_tech'], "⚙️"),
+            badge("LAND ASAP", row['class_impact_land'], "🛬"),
+        ])
 
-        st.code(f"""
-        <div style="margin-top:12px; margin-bottom:12px;
-                    padding:12px 8px 20px 8px;  /* top, right, bottom, left */
-                    border:1px solid #ddd; border-radius:8px; 
+        st.markdown(f"""
+        <div style="margin:12px 0; padding:12px 8px 20px 8px;
+                    border:1px solid #ddd; border-radius:8px;
                     background-color:#fdfdfd; font-size:16px;">
-        <b style="font-size:18px;">Impact Classes:</b>
-        {impact_html}
+            <b style="font-size:18px;">Impact Classes:</b>
+            {impact_html}
         </div>
         """, unsafe_allow_html=True)
 
