@@ -54,10 +54,10 @@ if not os.path.exists(CSV_PATH):
 
 df = pd.read_csv(CSV_PATH)
 
-# --- APP TITLE ---
+# --- app title ---
 st.title("🛫 Synthetic NOTAM Reinforcing Pipeline")
 
-# --- USER LOGIN ---
+# --- user login ---
 username = st.text_input("Enter your username (use lowercase, no spaces):").strip().lower()
 if not username:
     st.warning("Please enter your username to continue.")
@@ -65,32 +65,41 @@ if not username:
 
 USER_CSV = f"feedback_{username}.csv"
 
+# --- reminder ---
+st.info("💡 Reminder: If you already started annotating before, **upload your previous feedback CSV** "
+        "to resume from where you left off. If this is your first session, you can skip the upload.")
+
+# --- load or initialize ---
 st.markdown("### 📂 Load your previous feedback file (optional)")
 uploaded_file = st.file_uploader("Upload your feedback CSV to resume progress:", type=["csv"])
 
 if uploaded_file is not None:
-    # se l’utente carica un file → usa quello
+    # l'utente carica il file scaricato in precedenza
     df_user = pd.read_csv(uploaded_file)
     st.success("✅ Feedback file loaded. You can resume where you left off.")
 else:
-    # Se non carica nulla → prova a usare il file locale sul server
+    # se non carica nulla, usa quello sul server (se esiste)
     if os.path.exists(USER_CSV):
         df_user = pd.read_csv(USER_CSV)
     else:
         df_user = df.copy()
 
-# ensure feedback columns exist
+# assicurati che tutte le colonne di feedback esistano
 for col in ["fb_style", "fb_category", "fb_corrected_category",
-            "fb_realism", "fb_impact_med", "fb_impact_tech", "fb_impact_land", "fb_notes"]:
+            "fb_realism", "fb_impact_med", "fb_impact_tech",
+            "fb_impact_land", "fb_notes", "last_index"]:
     if col not in df_user.columns:
         df_user[col] = ""
 
-# --- TRACK PROGRESS ---
+# --- track progress ---
 if "index" not in st.session_state:
-    if "last_index" not in df_user.columns:
-        df_user["last_index"] = None
-    if df_user["last_index"].notna().any():
-        st.session_state.index = int(df_user["last_index"].iloc[0])
+    # prendi l'ultimo valore valido da last_index, se c'è
+    last_idx_vals = df_user["last_index"].dropna()
+    if not last_idx_vals.empty:
+        try:
+            st.session_state.index = int(last_idx_vals.astype(int).iloc[-1])
+        except Exception:
+            st.session_state.index = 0
     else:
         st.session_state.index = 0
 
@@ -101,12 +110,12 @@ if current_idx >= len(df_user):
 
 row = df_user.iloc[current_idx]
 
-# --- PROGRESS BAR ---
+# --- progress bar ---
 progress = (current_idx+1)/len(df_user)
 st.progress(progress)
 st.caption(f"NOTAM {current_idx+1} of {len(df_user)} for user: {username}")
 
-# --- EXTRACT CONTEXT & NOTAM TEXT ---
+# --- extract context and notam text ---
 full_text = row["e_line"]
 
 purpose_match = re.search(r"<Purpose>(.*?)</Purpose>", full_text)
