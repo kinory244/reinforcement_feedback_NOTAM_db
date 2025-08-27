@@ -92,15 +92,16 @@ for col in ["fb_style", "fb_category", "fb_corrected_category",
         df_user[col] = ""
 
 # --- track progress ---
+# --- TRACK PROGRESS ---
 if "index" not in st.session_state:
-    # prendi l'ultimo valore valido da last_index, se c'è
-    last_idx_vals = df_user["last_index"].dropna()
-    if not last_idx_vals.empty:
-        try:
-            st.session_state.index = int(last_idx_vals.astype(int).iloc[-1])
-        except Exception:
-            st.session_state.index = 0
-    else:
+    st.session_state.index = 0  # default
+
+# se l'utente ha caricato un file con last_index valido, aggiorna sempre
+last_idx_vals = df_user["last_index"].dropna()
+if not last_idx_vals.empty:
+    try:
+        st.session_state.index = int(last_idx_vals.astype(int).iloc[-1])
+    except Exception:
         st.session_state.index = 0
 
 current_idx = st.session_state.index
