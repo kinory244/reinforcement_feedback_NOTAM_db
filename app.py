@@ -359,8 +359,14 @@ with col2:
     impact_land = st.selectbox("🛬 Land ASAP:", impact_levels, index=impact_levels.index(row['class_impact_land']))
 
     # notes
-    notes = st.text_area("📝 Notes (optional)", placeholder="Write a comment...", height=120)
-
+    notes = st.text_area(
+        "📝 Notes (optional)",
+        value=row["fb_notes"] if pd.notna(row["fb_notes"]) else "",
+        placeholder="Write a comment...",
+        height=120,
+        key=f"notes_{current_idx}"  # chiave dinamica per ogni NOTAM
+    )
+    
     st.markdown("---")
 
     # save buttons
