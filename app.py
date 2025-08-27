@@ -205,13 +205,13 @@ with col1:
             if not value:
                 value = "N/A"
             return textwrap.dedent(f"""
-                <div style='margin:2px 0; font-size:16px; display:flex; align-items:center;'>
-                <span style='font-weight:bold; color:#000; margin-right:6px;'>{icon} {label}:</span>
-                <span style="background-color:{impact_map.get(value,'#95a5a6')}; color:#fff;
-                            padding:4px 12px; border-radius:12px; font-weight:bold;">
-                    {value}
-                </span>
-                </div>
+            <div style='margin:2px 0; font-size:16px; display:flex; align-items:center;'>
+              <span style='font-weight:bold; color:#000; margin-right:6px;'>{icon} {label}:</span>
+              <span style="background-color:{impact_map.get(value,'#95a5a6')}; color:#fff;
+                        padding:4px 12px; border-radius:12px; font-weight:bold;">
+                {value}
+              </span>
+            </div>
             """)
 
         impact_html = "".join([
