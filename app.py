@@ -127,7 +127,11 @@ for col in ["fb_style", "fb_category", "fb_corrected_category",
 
 # track current index
 if "index" not in st.session_state:
-    # riparti da last_index se esiste
+    # crea colonna last_index se non esiste
+    if "last_index" not in df_user.columns:
+        df_user["last_index"] = None
+
+    # riparti da last_index se valorizzata
     if df_user["last_index"].notna().any():
         st.session_state.index = int(df_user["last_index"].iloc[0])
     else:
