@@ -65,11 +65,19 @@ if not username:
 
 USER_CSV = f"feedback_{username}.csv"
 
-# --- LOAD OR INITIALIZE USER PROGRESS ---
-if os.path.exists(USER_CSV):
-    df_user = pd.read_csv(USER_CSV)
+st.markdown("### 📂 Load your previous feedback file (optional)")
+uploaded_file = st.file_uploader("Upload your feedback CSV to resume progress:", type=["csv"])
+
+if uploaded_file is not None:
+    # Se l’utente carica un file → usa quello
+    df_user = pd.read_csv(uploaded_file)
+    st.success("✅ Feedback file loaded. You can resume where you left off.")
 else:
-    df_user = df.copy()
+    # Se non carica nulla → prova a usare il file locale sul server
+    if os.path.exists(USER_CSV):
+        df_user = pd.read_csv(USER_CSV)
+    else:
+        df_user = df.copy()
 
 # ensure feedback columns exist
 for col in ["fb_style", "fb_category", "fb_corrected_category",
