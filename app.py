@@ -201,13 +201,12 @@ with col1:
 
         def badge(label, value, icon):
             return f"""
-            <div style='margin:6px 0; font-size:16px;'>
-                <span style='font-weight:bold; color:#000;'>{icon} {label}:</span>
-                <span style="background-color:{impact_map.get(value,'#95a5a6')};
-                            color:#fff; padding:4px 12px; border-radius:12px;
-                            font-weight:bold; margin-left:8px;">
-                    {value}
-                </span>
+            <div style='margin:2px 0; font-size:16px;'>
+            <span style='font-weight:bold; color:#000;'>{label}:</span>
+            <span style="background-color:{impact_map.get(value,'#95a5a6')}; color:#fff;
+                        padding:4px 12px; border-radius:12px; font-weight:bold; margin-left:8px;">
+                {value}
+            </span>
             </div>
             """
 
@@ -219,11 +218,11 @@ with col1:
 
         st.markdown(f"""
         <div style="margin-top:12px; margin-bottom:12px;
-                    padding:12px 8px 20px 8px;
+                    padding:12px 8px 20px 8px;  /* top, right, bottom, left */
                     border:1px solid #ddd; border-radius:8px; 
                     background-color:#fdfdfd; font-size:16px;">
-            <b style="font-size:18px;">Impact Classes:</b>
-            {impact_html}
+        <b style="font-size:18px;">Impact Classes:</b>
+        {impact_html}
         </div>
         """, unsafe_allow_html=True)
 
