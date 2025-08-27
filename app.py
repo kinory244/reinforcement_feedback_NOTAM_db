@@ -199,18 +199,20 @@ with col1:
             "Critical": "#e74c3c"   # red
         }
 
+        import textwrap
+
         def badge(label, value, icon=""):
             if not value:
                 value = "N/A"
-            return f"""
-            <div style='margin:2px 0; font-size:16px; display:flex; align-items:center;'>
+            return textwrap.dedent(f"""
+                <div style='margin:2px 0; font-size:16px; display:flex; align-items:center;'>
                 <span style='font-weight:bold; color:#000; margin-right:6px;'>{icon} {label}:</span>
                 <span style="background-color:{impact_map.get(value,'#95a5a6')}; color:#fff;
                             padding:4px 12px; border-radius:12px; font-weight:bold;">
                     {value}
                 </span>
-            </div>
-            """
+                </div>
+            """)
 
         impact_html = "".join([
             badge("MEDICAL EMERGENCY", row['class_impact_med'], "💊"),
