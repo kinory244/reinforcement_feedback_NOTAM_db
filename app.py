@@ -69,7 +69,7 @@ st.markdown("### 📂 Load your previous feedback file (optional)")
 uploaded_file = st.file_uploader("Upload your feedback CSV to resume progress:", type=["csv"])
 
 if uploaded_file is not None:
-    # Se l’utente carica un file → usa quello
+    # se l’utente carica un file → usa quello
     df_user = pd.read_csv(uploaded_file)
     st.success("✅ Feedback file loaded. You can resume where you left off.")
 else:
