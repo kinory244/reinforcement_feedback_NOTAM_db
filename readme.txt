@@ -1,15 +1,32 @@
-Questa ramificazione del progetto di costruzione del DB nasce affinché, parallelamente al setup di quest'ultimo, e con scale temporali anche più diradate, si possa iniziare un reinforcement loop tramite parere umano esperto sui dati che sto generando artificiosamente. Credo quindi che la soluzione migliore sia predisporre uno strumento che sia sempre utilizzabile dai piloti, a distanza, e con workload minimo, perché questi possano contribuire a una seconda versione del dataset. Diciamo che la prima versione sarà quella che costruirò con zero supporto. Con la seconda versione, avremo dei "reward" calcolati su ogni riga del csv files. Questi reward pensiamoli come punteggi che sono computati a partire dai giudizi dati sul NOTAM rispetto a credibilità, affinità col reale. 
+# 🛫 Synthetic NOTAM Reinforcing Pipeline
 
-Quindi l'app Streamlit consente di:
-- determinare quanto un pilota ci dà il check sul NOTAM
-- consentirgli contestualmente di cambiare la category dove lo ritiene opportuno e cambiare gli score di rilevanza per HAWKEYE
+Applicazione **Streamlit** per raccogliere feedback operativi da piloti su NOTAM sintetici.  
+Ogni utente lavora su una copia personalizzata del dataset e i risultati vengono salvati automaticamente sia in locale (su Streamlit Cloud) sia in **Google Drive** (CSV individuali).
 
-Potenzialmente il file:
+---
 
-notam_db_extract.csv 
+## ✨ Funzionalità principali
+- **Autenticazione**: accesso protetto da password (`st.secrets["APP_PASSWORD"]`).
+- **Database congelato**: i NOTAM vengono caricati da un file su Google Drive (versione di riferimento).
+- **Progress tracking**: ogni pilota può uscire e riprendere da dove aveva lasciato.
+- **Feedback guidato**:
+  - Correttezza stile ICAO
+  - Correttezza categoria
+  - Realismo operativo
+  - Impatto percepito (medico, tecnico, atterraggio immediato)
+  - Note libere
+- **Upload automatico su Google Drive**: ogni salvataggio aggiorna il CSV dell’utente in una cartella condivisa.
 
-corrisponde all'intero DB.
+---
 
-
-- Inserire logica all'interno di APP tale per cui:
-Ciascun pilota abbia accesso a una fetta del DB, complementare a quella dell'altro pilota. 
+## 🚀 Deploy su Streamlit Cloud
+1. Fork/Clona la repo su GitHub.
+2. Deploya su [Streamlit Cloud](https://share.streamlit.io).
+3. Configura i secrets:
+   ```toml
+   APP_PASSWORD = "super_password_segreta"
+   DB_URL = "https://drive.google.com/uc?id=YOUR_FILE_ID"
+   GDRIVE_CREDENTIALS = """
+   { ...contenuto JSON del Service Account... }
+   """
+   GDRIVE_FOLDER_ID = "ID_DELLA_CARTELLA_SU_DRIVE"

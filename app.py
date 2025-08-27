@@ -1,11 +1,86 @@
+"""
+🛫 Synthetic NOTAM Reinforcing Pipeline
+======================================
+
+Questa applicazione Streamlit permette di raccogliere feedback da piloti su NOTAM sintetici.
+Ogni utente accede con username e password, lavora su una copia personale del dataset e i feedback vengono salvati in file CSV caricati automaticamente su Google Drive.
+
+👨‍💻 Flusso generale:
+1. L'utente inserisce una password di accesso (presa dai secrets di Streamlit).
+2. Viene caricato il database congelato dei NOTAM da Google Drive.
+3. L'utente inserisce il proprio username → Si crea un file dedicato (feedback_<username>.csv).
+4. Per ogni NOTAM vengono mostrati:
+   - Contesto (Purpose, Topic)
+   - Testo del NOTAM
+   - Categoria con info di rilevanza
+   - Classi di impatto
+5. L'utente fornisce feedback.
+6. Il feedback viene salvato localmente e caricato in una cartella condivisa su Google Drive.
+7. L'utente può:
+   - Navigare avanti/indietro
+   - Salvare feedback
+   - Uscire e riprendere da dove aveva lasciato.
+
+🔒 Sicurezza:
+- La password di accesso è in `st.secrets["APP_PASSWORD"]`.
+- L'URL del DB e le credenziali del service account Google Drive sono nei secrets di Streamlit.
+- I file CSV vengono salvati sia localmente (nel container) sia su Drive.
+
+📂 Output:
+- Ogni utente produce un file CSV: `feedback_<username>.csv`
+  che viene aggiornato man mano che compila i feedback.
+
+"""
+
 import streamlit as st
 st.set_page_config(page_title="Synthetic NOTAM Reinforcing Pipeline", layout="wide")
-
 import pandas as pd
 import os
+import json
 import re
 import gdown
 from notam_tags_rel_levels import notam_general_relevance  # importa il dizionario
+from pydrive2.auth import GoogleAuth
+from pydrive2.drive import GoogleDrive
+
+@st.cache_resource
+def get_drive():
+    from pydrive2.auth import ServiceAccountCredentials
+
+    creds_dict = json.loads(st.secrets["GDRIVE_CREDENTIALS"])
+
+    # crea credenziali da dizionario
+    credentials = ServiceAccountCredentials.from_json_keyfile_dict(
+        creds_dict,
+        scopes=["https://www.googleapis.com/auth/drive"]
+    )
+
+    gauth = GoogleAuth()
+    gauth.auth_method = "service"
+    gauth.credentials = credentials
+    drive = GoogleDrive(gauth)
+    return drive
+
+def upload_to_drive(local_file, remote_name, folder_id=None):
+    drive = get_drive()
+    # cerca se esiste già un file con questo nome in cartella
+    if folder_id:
+        query = f"'{folder_id}' in parents and title='{remote_name}'"
+    else:
+        query = f"title='{remote_name}'"
+    file_list = drive.ListFile({'q': query}).GetList()
+
+    if file_list:
+        file_drive = file_list[0]
+    else:
+        meta = {'title': remote_name}
+        if folder_id:
+            meta['parents'] = [{'id': folder_id}]
+        file_drive = drive.CreateFile(meta)
+
+    file_drive.SetContentFile(local_file)
+    file_drive.Upload()
+    return file_drive['id']
 
 # password check
 password = st.text_input("🔑 Enter access password:", type="password")
@@ -285,7 +360,7 @@ with col2:
     st.markdown("---")
 
     # save buttons
-    colb1, colb2, colb3, colb4 = st.columns(3)
+    colb1, colb2, colb3, colb4 = st.columns(4)
 
     if colb1.button("⬅️ Previous", disabled=(current_idx == 0)):
         st.session_state.index -= 1
@@ -305,15 +380,29 @@ with col2:
         df_user.to_csv(USER_CSV, index=False)
         st.success("✅ Feedback saved. Now click NEXT to continue.")
 
+        # upload su Google Drive
+        try:
+            file_id = upload_to_drive(USER_CSV, USER_CSV, folder_id=st.secrets.get("GDRIVE_FOLDER_ID"))
+            st.success(f"✅ Feedback saved & uploaded to Drive (file id: {file_id})")
+        except Exception as e:
+            st.error(f"⚠️ Saved locally but failed to upload to Drive: {e}")
+
     if colb3.button("Next ➡️"):
         st.session_state.index += 1
         st.rerun()
 
     if colb4.button("🚪 Exit for today"):
-        # salva anche la posizione corrente
+        # salva posizione corrente
         df_user["last_index"] = st.session_state.index
         df_user.to_csv(USER_CSV, index=False)
-        st.info("👋 Session saved, you can continue tomorrow.")
+
+        # upload su Google Drive
+        try:
+            file_id = upload_to_drive(USER_CSV, USER_CSV, folder_id=st.secrets.get("GDRIVE_FOLDER_ID"))
+            st.info(f"👋 Session saved and uploaded to Drive (file id: {file_id}). You can continue tomorrow.")
+        except Exception as e:
+            st.error(f"⚠️ Session saved locally but failed to upload to Drive: {e}")
+
         st.stop()
 
     # --- keep only selected columns for saving ---
