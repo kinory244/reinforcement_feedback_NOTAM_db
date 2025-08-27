@@ -52,12 +52,17 @@ for col in ["fb_style", "fb_category", "fb_corrected_category",
 
 # track current index
 if "index" not in st.session_state:
-    st.session_state.index = 0
+    # riparti da last_index se esiste
+    if df_user["last_index"].notna().any():
+        st.session_state.index = int(df_user["last_index"].iloc[0])
+    else:
+        st.session_state.index = 0
 
 current_idx = st.session_state.index
 if current_idx >= len(df_user):
     st.success(f"✅ {username}, you have completed all NOTAMs. Thank you! 🎉")
     st.stop()
+
 
 row = df_user.iloc[current_idx]
 
@@ -280,7 +285,7 @@ with col2:
     st.markdown("---")
 
     # save buttons
-    colb1, colb2, colb3 = st.columns(3)
+    colb1, colb2, colb3, colb4 = st.columns(3)
 
     if colb1.button("⬅️ Previous", disabled=(current_idx == 0)):
         st.session_state.index -= 1
@@ -303,6 +308,13 @@ with col2:
     if colb3.button("Next ➡️"):
         st.session_state.index += 1
         st.rerun()
+
+    if colb4.button("🚪 Exit for today"):
+        # salva anche la posizione corrente
+        df_user["last_index"] = st.session_state.index
+        df_user.to_csv(USER_CSV, index=False)
+        st.info("👋 Session saved, you can continue tomorrow.")
+        st.stop()
 
     # --- keep only selected columns for saving ---
     cols_keep = [
