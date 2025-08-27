@@ -203,19 +203,23 @@ with col1:
             </span>
             </div>
             """
+        
         impact_html = (
             badge("🩺 MEDICAL EMERGENCY", row['class_impact_med']) +
             badge("⚙️ TECHNICAL ISSUE", row['class_impact_tech']) +
             badge("🛬 LAND ASAP", row['class_impact_land'])
         )
+
         st.markdown(f"""
-        <div style="margin-top:12px; margin-bottom:12px; padding:12px 8px 20px 8px;
-                    border:1px solid #ddd; border-radius:8px; background-color:#fdfdfd;
-                    font-size:16px;">
+        <div style="margin-top:12px; margin-bottom:12px;
+                    padding:12px 8px 20px 8px;  
+                    border:1px solid #ddd; border-radius:8px; 
+                    background-color:#fdfdfd; font-size:16px;">
         <b style="font-size:18px;">Impact Classes:</b>
         {impact_html}
         </div>
         """, unsafe_allow_html=True)
+
 
 with col2:
     st.subheader("📋 Feedback Evaluation")
