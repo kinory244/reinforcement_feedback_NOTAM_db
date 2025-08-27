@@ -18,8 +18,8 @@ if password != st.secrets["APP_PASSWORD"]:
     st.stop()
 
 # scarico db.csv da Google Drive se non presente
-CSV_PATH = "notam_db_extract.csv"
-url = "https://drive.google.com/uc?id=1jdzan1EDwd4c-foEM3tZtCHqIE0T0J4X"   # sostituisci con l’ID del file definitivo su Drive
+CSV_PATH = "db.csv"
+url = st.secrets["DB_URL"]
 
 if not os.path.exists(CSV_PATH):
     with st.spinner("Downloading NOTAM database (first run)..."):
