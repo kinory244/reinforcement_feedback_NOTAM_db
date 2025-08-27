@@ -61,27 +61,27 @@ def get_drive():
     drive = GoogleDrive(gauth)
     return drive
 
-def upload_to_drive(local_file, remote_name, folder_id=None):
+def upload_to_drive(local_file, remote_name, folder_id):
     drive = get_drive()
-    # cerca se esiste già un file con questo nome in cartella
-    if folder_id:
-        query = f"'{folder_id}' in parents and title='{remote_name}'"
-    else:
-        query = f"title='{remote_name}'"
+
+    # cerca se esiste già un file con lo stesso nome dentro la cartella
+    query = f"'{folder_id}' in parents and title='{remote_name}' and trashed=false"
     file_list = drive.ListFile({'q': query}).GetList()
 
-    if file_list:
+    if file_list:  
+        # se esiste, lo aggiorna
         file_drive = file_list[0]
     else:
-        meta = {'title': remote_name}
-        if folder_id:
-            # 👇 forziamo che il file nasca dentro la cartella condivisa con te
-            meta['parents'] = [{'id': folder_id}]
-        file_drive = drive.CreateFile(meta)
+        # altrimenti lo crea da zero
+        file_drive = drive.CreateFile({
+            "title": remote_name,
+            "parents": [{"id": folder_id}]
+        })
 
     file_drive.SetContentFile(local_file)
     file_drive.Upload()
-    return file_drive['id']
+
+    return file_drive["id"]
 
 
 # password check
