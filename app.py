@@ -192,30 +192,27 @@ with col1:
         """, unsafe_allow_html=True)
 
         # impact classes
-        impact_map = {"Low": "#2ecc71", "Medium": "#f1c40f", "High": "#e67e22", "Critical": "#e74c3c"}
-        # def badge(label, value):
-        #     return f"""
-        #     <div style='margin:2px 0; font-size:16px;'>
-        #     <span style='font-weight:bold; color:#000;'>{label}:</span>
-        #     <span style="background-color:{impact_map.get(value,'#95a5a6')}; color:#fff;
-        #                 padding:4px 12px; border-radius:12px; font-weight:bold; margin-left:8px;">
-        #         {value}
-        #     </span>
-        #     </div>
-        #     """
+        impact_map = {
+            "Low": "#2ecc71",       # green
+            "Medium": "#f1c40f",    # yellow
+            "High": "#e67e22",      # orange
+            "Critical": "#e74c3c"   # red
+        }
 
-        def badge(label, value, icon=""):
+        def badge(label, value, icon):
             return f"""
             <div style='margin:6px 0; font-size:16px;'>
                 <span style='font-weight:bold; color:#000;'>{icon} {label}:</span>
-                <span style="background-color:{impact_map.get(value,'#95a5a6')}; color:#fff;
-                            padding:4px 12px; border-radius:12px; font-weight:bold; margin-left:8px;">
+                <span style="background-color:{impact_map.get(value,'#95a5a6')};
+                            color:#fff; padding:4px 12px; border-radius:12px;
+                            font-weight:bold; margin-left:8px;">
                     {value}
                 </span>
             </div>
             """
+
         impact_html = (
-            badge("MEDICAL EMERGENCY", row['class_impact_med'], "🩺") +
+            badge("MEDICAL EMERGENCY", row['class_impact_med'], "💊") +
             badge("TECHNICAL ISSUE", row['class_impact_tech'], "⚙️") +
             badge("LAND ASAP", row['class_impact_land'], "🛬")
         )
@@ -225,11 +222,10 @@ with col1:
                     padding:12px 8px 20px 8px;
                     border:1px solid #ddd; border-radius:8px; 
                     background-color:#fdfdfd; font-size:16px;">
-        <b style="font-size:18px;">Impact Classes:</b>
-        {impact_html}
+            <b style="font-size:18px;">Impact Classes:</b>
+            {impact_html}
         </div>
         """, unsafe_allow_html=True)
-
 
 with col2:
     st.subheader("📋 Feedback Evaluation")
