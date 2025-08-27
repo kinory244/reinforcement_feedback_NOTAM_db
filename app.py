@@ -1,22 +1,36 @@
 import streamlit as st
+st.set_page_config(page_title="Synthetic NOTAM Reinforcing Pipeline", layout="wide")
+
 import pandas as pd
 import os
 import re
+import gdown
 from notam_tags_rel_levels import notam_general_relevance  # importa il dizionario
 
-CSV_PATH = "notam_db_extract.csv"
+# password check
+password = st.text_input("🔑 Enter access password:", type="password")
 
-# load dataset
-if os.path.exists(CSV_PATH):
-    df = pd.read_csv(CSV_PATH)
-else:
-    st.error("CSV file not found!")
+if not password:  # se il campo è vuoto
     st.stop()
 
-st.set_page_config(page_title="Synthetic NOTAM Reinforcing Pipeline", layout="wide")
+if password != st.secrets["APP_PASSWORD"]:
+    st.error("❌ Wrong password")
+    st.stop()
+
+# scarico db.csv da Google Drive se non presente
+CSV_PATH = "notam_db_extract.csv"
+url = "https://drive.google.com/uc?id=1jdzan1EDwd4c-foEM3tZtCHqIE0T0J4X"   # sostituisci con l’ID del file definitivo su Drive
+
+if not os.path.exists(CSV_PATH):
+    with st.spinner("Downloading NOTAM database (first run)..."):
+        gdown.download(url, CSV_PATH, quiet=False)
+
+# carica il database congelato
+df = pd.read_csv(CSV_PATH)
+
 st.title("🛫 Synthetic NOTAM Reinforcing Pipeline")
 
-# --- USER LOGIN ---
+# user login
 username = st.text_input("Enter your username (use lowercase, no spaces):").strip().lower()
 if not username:
     st.warning("Please enter your username to continue.")
